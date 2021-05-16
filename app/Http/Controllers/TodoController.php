@@ -29,7 +29,7 @@ class TodoController extends BaseController
      * @param Request $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request): \Illuminate\Http\Response
+    public function store(Request $request)
     {
         $input = $request->all();
         $id = auth('sanctum')->user()->id;
