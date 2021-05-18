@@ -19,7 +19,7 @@ class Todo extends JsonResource
             'todo' => $this->todo,
             'memo' => $this->memo,
             'user_id' => $this->user_id,
-            'created_at' => $this->created_at->format('m/d/Y'),
+            'created_at' => $this->created_at->format('l'),
             'updated_at' => $this->updated_at->format('m/d/Y'),
         ];
     }

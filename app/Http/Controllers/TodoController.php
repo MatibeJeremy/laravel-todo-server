@@ -66,7 +66,7 @@ class TodoController extends BaseController
      */
     public function show_date($date_)
     {
-        $string = str_replace(' ', '-', $date_);
+        $string = str_replace(' ', '-',$date_);
         $date =Carbon::parse($string)->format('Y-m-d');
         $todos = Todo::whereDate('created_at', $date)->get();
 
@@ -74,6 +74,22 @@ class TodoController extends BaseController
             'date' => $date,
             'data' => $todos
         ]);
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param
+     * @return \Illuminate\Http\Response
+     */
+    public function weeks_data($date_)
+    {
+        $string = str_replace(' ', '-',$date_);
+        $date =Carbon::parse($string)->format('Y-m-d');
+        $sub_date = Carbon::today()->subDays(7);
+        $todos = Todo::whereBetween('created_at',[$sub_date,$date])->orderBy('created_at', 'DESC')->get();
+
+        return $this->sendResponse(TodoResource::collection($todos), 'Todos fetched.');
     }
 
 
