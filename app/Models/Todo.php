@@ -12,7 +12,8 @@ class Todo extends Model
     protected $fillable = [
         'todo',
         'memo',
-        'user_id'
+        'user_id',
+        'created_at'
     ];
 
 }

@@ -14,9 +14,7 @@ class AddUserIdFieldInTodos extends Migration
     public function up()
     {
         Schema::table('todos', function (Blueprint $table) {
-//            $table->unsignedInteger('user_id');
-//
-//            $table->foreign('user_id')->references('id')->on('users');
+            $table->unsignedInteger('user_id');
         });
     }
 
@@ -28,9 +26,6 @@ class AddUserIdFieldInTodos extends Migration
     public function down()
     {
         Schema::table('todos', function (Blueprint $table) {
-            $table->dropForeign('lists_user_id_foreign');
-            $table->dropIndex('lists_user_id_index');
-            $table->dropColumn('user_id');
         });
     }
 }

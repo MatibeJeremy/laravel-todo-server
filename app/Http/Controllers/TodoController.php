@@ -39,7 +39,13 @@ class TodoController extends BaseController
         if($validator->fails()){
             return $this->sendError($validator->errors());
         }
-        $todo = Todo::create(array_merge($input,['user_id' => $id]));
+        $date = Carbon::parse($input['date']);
+        $todo = new Todo;
+        $todo->memo = $input['memo'];
+        $todo->todo = $input['todo'];
+        $todo->created_at = $date;
+        $todo->user_id = $id;
+        $todo->save();
         return $this->sendResponse(new TodoResource($todo), 'Todo created.');
     }
 
@@ -87,7 +93,7 @@ class TodoController extends BaseController
         $string = str_replace(' ', '-',$date_);
         $date =Carbon::parse($string)->format('Y-m-d');
         $sub_date = Carbon::today()->subDays(7);
-        $todos = Todo::whereBetween('created_at',[$sub_date,$date])->orderBy('created_at', 'DESC')->get();
+        $todos = Todo::whereBetween('created_at',[$sub_date,$date])->orderBy('created_at')->get();
 
         return $this->sendResponse(TodoResource::collection($todos), 'Todos fetched.');
     }
@@ -96,27 +102,28 @@ class TodoController extends BaseController
     /**
      * Update the specified resource in storage.
      *
-     * @param Request $request
-     * @param Todo $todo
+     * @param $todo
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, Todo $todo)
     {
         $input = $request->all();
+        $date = Carbon::parse($input['date']);
+        return $date;
 
-        $validator = Validator::make($input, [
-            'todo' => 'required'
-        ]);
-
-        if($validator->fails()){
-            return $this->sendError($validator->errors());
-        }
-
-        $todo->todo = $input['todo'];
-        $todo->memo = $input['memo'];
-        $todo->save();
-
-        return $this->sendResponse(new TodoResource($todo), 'Todo updated.');
+//        $validator = Validator::make($input, [
+//            'todo' => 'required'
+//        ]);
+//
+//        if($validator->fails()){
+//            return $this->sendError($validator->errors());
+//        }
+//
+//        $todo->todo = $input['todo'];
+//        $todo->memo = $input['memo'];
+//        $todo->save();
+//
+//        return $this->sendResponse(new TodoResource($todo), 'Todo updated.');
     }
 
     /**

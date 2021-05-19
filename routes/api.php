@@ -32,6 +32,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('/auth/logout', [AuthController::class, 'logout']);
     Route::get('todos', [TodoController::class,'index']);
     Route::post('todos', [TodoController::class,'store']);
+    Route::post('todos/update', [TodoController::class,'update']);
     Route::get('todos/get_date/{date}', [TodoController::class,'show_date']);
     Route::get('todos/get_week/{date}', [TodoController::class,'weeks_data']);
 });
