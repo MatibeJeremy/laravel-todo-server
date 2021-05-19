@@ -25,7 +25,7 @@ class TodoFactory extends Factory
     {
         return [
             'todo' => $this->faker->text(),
-            'user_id' => rand(1,50),
+            'user_id' => 1,
             'created_at' => Carbon::today()->subDays(rand(0, 30)),
         ];
     }

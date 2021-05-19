@@ -19,7 +19,8 @@ class TodoController extends BaseController
      */
     public function index()
     {
-        $todos = Todo::all();
+        $user_id = auth('sanctum')->user()->id;
+        $todos = Todo::where('user_id',$user_id);
         return $this->sendResponse(TodoResource::collection($todos), 'Todos fetched.');
     }
 
@@ -74,7 +75,8 @@ class TodoController extends BaseController
     {
         $string = str_replace(' ', '-',$date_);
         $date =Carbon::parse($string)->format('Y-m-d');
-        $todos = Todo::whereDate('created_at', $date)->get();
+        $id = auth('sanctum')->user()->id;
+        $todos = Todo::select('*')->where([['created_at',$date],['user_id' ,$id]])->get();
 
         return response()->json([
             'date' => $date,
@@ -93,7 +95,8 @@ class TodoController extends BaseController
         $string = str_replace(' ', '-',$date_);
         $date =Carbon::parse($string)->format('Y-m-d');
         $sub_date = Carbon::today()->subDays(7);
-        $todos = Todo::whereBetween('created_at',[$sub_date,$date])->orderBy('created_at')->get();
+        $id = auth('sanctum')->user()->id;
+        $todos = Todo::whereBetween('created_at',[$sub_date,$date])->where('user_id',$id)->orderBy('created_at')->get();
 
         return $this->sendResponse(TodoResource::collection($todos), 'Todos fetched.');
     }
@@ -109,21 +112,20 @@ class TodoController extends BaseController
     {
         $input = $request->all();
         $date = Carbon::parse($input['date']);
-        return $date;
 
-//        $validator = Validator::make($input, [
-//            'todo' => 'required'
-//        ]);
-//
-//        if($validator->fails()){
-//            return $this->sendError($validator->errors());
-//        }
-//
-//        $todo->todo = $input['todo'];
-//        $todo->memo = $input['memo'];
-//        $todo->save();
-//
-//        return $this->sendResponse(new TodoResource($todo), 'Todo updated.');
+        $validator = Validator::make($input, [
+            'todo' => 'required'
+        ]);
+
+        if($validator->fails()){
+            return $this->sendError($validator->errors());
+        }
+
+        $todo->todo = $input['todo'];
+        $todo->memo = $input['memo'];
+        $todo->save();
+
+        return $this->sendResponse(new TodoResource($todo), 'Todo updated.');
     }
 
     /**
@@ -134,6 +136,7 @@ class TodoController extends BaseController
      */
     public function destroy(Todo $todo)
     {
+
         $todo->delete();
         return $this->sendResponse([], 'Todo deleted.');
     }
