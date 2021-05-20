@@ -31,8 +31,12 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
     Route::post('/auth/logout', [AuthController::class, 'logout']);
     Route::get('todos', [TodoController::class,'index']);
+    Route::get('todos/pinned/{date}', [TodoController::class,'pinned']);
+    Route::get('todos/pin/{id}', [TodoController::class,'pin_todo']);
+    Route::get('todos/unpin/{id}', [TodoController::class,'unpin_todo']);
     Route::post('todos', [TodoController::class,'store']);
-    Route::post('todos/update', [TodoController::class,'update']);
+    Route::delete('todos/{id}', [TodoController::class,'destroy']);
+    Route::post('todos/update', [TodoController::class,'postMemo']);
     Route::get('todos/get_date/{date}', [TodoController::class,'show_date']);
     Route::get('todos/get_week/{date}', [TodoController::class,'weeks_data']);
 });

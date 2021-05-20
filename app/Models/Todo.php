@@ -13,7 +13,9 @@ class Todo extends Model
         'todo',
         'memo',
         'user_id',
-        'created_at'
+        'created_at',
+        'pinned',
+        'completed'
     ];
 
 }

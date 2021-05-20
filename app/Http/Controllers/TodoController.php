@@ -21,7 +21,22 @@ class TodoController extends BaseController
     {
         $user_id = auth('sanctum')->user()->id;
         $todos = Todo::where('user_id',$user_id);
+        $todos = Todo::select('*')->where([['pinned',0],['user_id' ,$user_id]])->get();
         return $this->sendResponse(TodoResource::collection($todos), 'Todos fetched.');
+    }
+
+    /**
+     * Display pinned todos
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function pinned($date_)
+    {
+        $string = str_replace(' ', '-',$date_);
+        $date =Carbon::parse($string)->format('Y-m-d');
+        $user_id = auth('sanctum')->user()->id;
+        $todos = Todo::select('*')->where([['user_id',$user_id],['pinned' ,1],['created_at',$date]])->get();
+        return $this->sendResponse(TodoResource::collection($todos), 'Pinned Todos fetched.');
     }
 
     /**
@@ -51,6 +66,32 @@ class TodoController extends BaseController
     }
 
     /**
+     * Pin to do on top of div
+     * @param $id
+     * @return \Illuminate\Http\Response
+     */
+    public function pin_todo($id){
+
+        $todo=Todo::find($id);
+        $todo->pinned = 1;
+        $todo->save();
+        return $this->sendResponse($todo, 'Todo pinned.');
+    }
+
+    /**
+     * Unpin from the top of div
+     * @param $id
+     * @return \Illuminate\Http\Response
+     */
+    public function unpin_todo($id){
+
+        $todo=Todo::find($id);
+        $todo->pinned = 0;
+        $todo->save();
+        return $this->sendResponse($todo, 'Todo unpinned.');
+    }
+
+    /**
      * Display the specified resource.
      *
      * @param
@@ -76,7 +117,7 @@ class TodoController extends BaseController
         $string = str_replace(' ', '-',$date_);
         $date =Carbon::parse($string)->format('Y-m-d');
         $id = auth('sanctum')->user()->id;
-        $todos = Todo::select('*')->where([['created_at',$date],['user_id' ,$id]])->get();
+        $todos = Todo::select('*')->where([['created_at',$date],['user_id' ,$id],['pinned',0]])->get();
 
         return response()->json([
             'date' => $date,
@@ -105,39 +146,30 @@ class TodoController extends BaseController
     /**
      * Update the specified resource in storage.
      *
-     * @param $todo
+     * @param Request $request
+     * @param $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Todo $todo)
+    public function postMemo(Request $request)
     {
-        $input = $request->all();
-        $date = Carbon::parse($input['date']);
-
-        $validator = Validator::make($input, [
-            'todo' => 'required'
-        ]);
-
-        if($validator->fails()){
-            return $this->sendError($validator->errors());
-        }
-
-        $todo->todo = $input['todo'];
-        $todo->memo = $input['memo'];
+        $todo=Todo::find($request->id);
+        $todo->memo = $request->memo;
         $todo->save();
 
-        return $this->sendResponse(new TodoResource($todo), 'Todo updated.');
+
+        return $request->all();
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param Todo $todo
+     * @param $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Todo $todo)
+    public function destroy($id)
     {
-
+        $todo=Todo::find($id);
         $todo->delete();
-        return $this->sendResponse([], 'Todo deleted.');
+        return $this->sendResponse($todo, 'Todo deleted.');
     }
 }
